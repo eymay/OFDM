@@ -21,6 +21,7 @@ for num=1:1000
     rec_awgn=time_cp;
     
     for kk=1:length(SNR)
+
         rec_fading_noisy = rec_fading + noise*10^(-SNR(kk)/20);
         rec_awgn_noisy = rec_awgn + noise*10^(-SNR(kk)/20);
         rec_fading_freq= fft(rec_fading_noisy(G+1:end))/sqrt(N);
