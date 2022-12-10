@@ -1,6 +1,6 @@
-clear all
-close all
-clc
+% clear all
+% close all
+% clc
 %% Simulation Parameters
 %Moduluation method QPSK
 
@@ -44,3 +44,4 @@ x = ifft(X_blocks);
 %Add cyclic prefix entension and shift from parallel to serial
 x_cpe = [x(end-n_cpe+1:end,:);x];
 x_s = x_cpe(:);
+data = x_s;
