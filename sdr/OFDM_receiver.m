@@ -36,6 +36,8 @@ X_hat_blocks = fft(x_p_cpr);
 X_hat = X_hat_blocks(:);
 X_hat = X_hat(1:end);
 
+scatterplot(X_hat,4)
+
 dem_symbol = qamdemod(X_hat,4);
 
 sym_rem = 0;

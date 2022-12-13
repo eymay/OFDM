@@ -9,11 +9,12 @@ N = 9600; % Number of data bits
 %fft Size
 nfft = 64;
 n_fft = 64;
-
+n_plt = 6;
+data_len = n_fft-n_plt;
 %Size of cycle prefix extension
 n_cpe = 16;
 
-snr = 20; % in dB
+snr = 40; % in dB
 
 %number of channel taps.
 
@@ -36,44 +37,60 @@ mod_data = qammod(cons_sym_id,4);
 
 %% Use IFFT to move to time domain
 % pad input signal to appropriate length
-fft_rem = mod(n_fft-mod(length(mod_data),n_fft),n_fft);
+fft_rem = mod(data_len-mod(length(mod_data),data_len),data_len);
 X_padded = [mod_data;zeros(fft_rem,1)];
-X_blocks = reshape(X_padded,nfft,length(X_padded)/nfft);
-x = ifft(X_blocks);
+X_blocks = reshape(X_padded,data_len,length(X_padded)/data_len);
+% x = ifft(X_blocks);
 
 %Add cyclic prefix entension and shift from parallel to serial
 x_cpe = [x(end-n_cpe+1:end,:);x];
 x_s = x_cpe(:);
-%% Apply fading channel 
+
+%% Apply fading channel
 g = exp(-(0:n_taps-1));
 g = g/norm(g);
-x_s_fading = conv(x_s,g,'same');
+% x_s_fading = conv(x_s,g,'same');
+
+x_s_fading = zeros(80,75);
+for ii = 1:75
+    x_s_fading(:,ii) = conv(x_cpe(:,ii), g, 'same');
+    
+end
+x_s =  x_s_fading(:);
 
 %% Add AWGN
 % Calculate data power
-data_pwr = mean(abs(x_s.^2));
+data_pwr =1 ;% mean(abs(x_s.^2));
 
 % Add noise to the channel
 noise_pwr = data_pwr/10^(snr/10);
 noise = normrnd(0,sqrt(noise_pwr/2),size(x_s))+normrnd(0,sqrt(noise_pwr/2),size(x_s))*1i;
+noise = zeros(size(noise));
 % Measure SNR
 snr_meas = 10*log10(mean(abs(x_s.^2))/mean(abs(noise.^2)));
-x_s_noise_fading = x_s_fading + noise;
+x_s_noise_fading = x_s + noise;
+
 %% Use FFT to move to frequency domain
 % Remove cyclic prefix extension and shift from serial to parallel
 x_p = reshape(x_s_noise_fading,nfft+n_cpe,length(x_s_noise_fading)/(nfft+n_cpe));
 x_p_cpr = x_p(n_cpe+1:end,:);
 
 % Move to frequency domain
-X_hat_blocks = fft(x_p_cpr);
+% X_hat_blocks = fft(x_p_cpr);
+for i = 1:75
+    X_hat_blocks(:,i) = fft(x_p_cpr(:,i));
+end
 %% Channel estimation
 
- G = X_hat_blocks(:,1)./X_blocks(:,1);
- X_hat_blocks = X_hat_blocks./repmat(G,1,size(X_hat_blocks,2));
+G = X_hat_blocks(:,1)./X_blocks(:,1);
+X_hat_blocks1 = X_hat_blocks./repmat(G,1,size(X_hat_blocks,2));
 %% Symbol demodulation
-% remove fft padding 
-X_hat = X_hat_blocks(:);
+% remove fft padding
+X_hat = X_hat_blocks1(:);
 X_hat = X_hat(1:end-fft_rem);
+
+scatterplot(X_hat,4)
+grid on
 
 dem_symbol = qamdemod(X_hat,4);
 
