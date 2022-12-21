@@ -12,7 +12,7 @@ si=1; %for BER rows
 %Size of cycle prefix extension
 n_cpe = 16;
 Nfft = 64;
-n_taps = 8;
+n_taps = 3;
 
 g = exp(-(0:n_taps-1));
 g = g/norm(g);
@@ -56,15 +56,15 @@ for d=1:80;
     
     x_s_fading = conv(x_cpe, g, 'same');
     
-%     ofdm_sig=awgn(x_s_fading,snr,'measured');
+%         x_s_fading=awgn(x_cpe,snr,'measured');
     
     
     %%
     %               Receiver
     %% Removing CP and FFT
     
-%     x_p_cpr = ofdm_sig(n_cpe+1:end,:);
-     x_p_cpr = x_s_fading(n_cpe+1:end,:);
+    %     x_p_cpr = ofdm_sig(n_cpe+1:end,:);
+    x_p_cpr = x_s_fading(n_cpe+1:end,:);
     
     X_ffted = fft(x_p_cpr);
     
@@ -74,8 +74,24 @@ for d=1:80;
     
     H_interpolated = interpolate(ls_channel',pilot_loc,Nfft,'spline');
     
-    X_equ = X_ffted./H_interpolated';
+    X_equ(:,d) = X_ffted.*conj(H_interpolated')./abs(H_interpolated').^2;
+
+    %% Demodulation
+    
+    dem_symbol = qamdemod(X_equ,4);
+    
+    sym_rem = 0;
+    
+    dem_symbol = [dem_symbol(2:16,1); dem_symbol(18:32,1); dem_symbol(34:48,1); dem_symbol(50:64,1)]; 
+    
+    ber = 1-sum(dem_symbol(:) == cons_sym_id(:))/length(dem_symbol);
+            
+            
 end
+
+   
+
+    
 
 
 function [H_interpolated] = interpolate(H,pilot_loc,Nfft,method)
