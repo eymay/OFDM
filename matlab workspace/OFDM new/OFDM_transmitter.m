@@ -22,7 +22,7 @@ g = g/norm(g);
 snr = 15;
 
 %%
-for d=1:symbol_number;
+for d=1:symbol_number
     data=t_data(x:x+119);
     x=x+120;
     k=3;
@@ -34,10 +34,10 @@ for d=1:symbol_number;
     %% Binary stream to symbols
     
     cons_data = reshape(data,2,length(data)/2)';
-    cons_sym_id = bi2de(cons_data);
+    cons_sym_id(:,d) = bi2de(cons_data);
     %% symbol modulation
     
-    mod_data = qammod(cons_sym_id,4);
+    mod_data = qammod(cons_sym_id(:,d),4);
     %% Pilot insertion
     
     
@@ -67,7 +67,7 @@ x_cpe = [seq, seq, x_cpe(:,1:40) seq x_cpe(:,41:80)]; % preamble location 1 2 43
 
 x_transmitted = reshape(x_cpe,[1,size(x_cpe,1)*size(x_cpe,2)]);
 
-y = x_transmitted';
+y = x_transmitted.';
 
 
 

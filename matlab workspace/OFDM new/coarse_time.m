@@ -46,7 +46,7 @@ starting_point = starting_point_array(1)
 freqEst = Fs/L*(angle(P(starting_point))/(2*pi));
 
 nn = 0: length(r_CFO)-1;
-r_compansated = r_CFO.*exp(1i*2*pi*freqEst.*nn'/Fs);
+r_compansated = r_CFO.*exp(-1i*2*pi*freqEst.*nn'/Fs);
 
  for k=starting_point-10:starting_point+10                %% Fine time senk
         P_fine_corr_max(k) = max(xcorr(r_compansated(k:k+1*m-1), [seq]));
@@ -67,8 +67,11 @@ for ii=1:N                   %% Auto corr döngüsü
 end
 
 
+freqEst_fine = Fs/L*(angle(P_fine_freq(idx))/(2*pi));
+
+nn = 0: length(r_compansated)-1;
+r_compansated = r_compansated.*exp(-1i*2*pi*freqEst_fine.*nn'/Fs);
+
+
 rx = r_compansated(idx:end);
-% freqEst_fine = Fs/L*(angle(P_fine_freq(idx))/(2*pi));
-% 
-% nn = 0: length(r_compansated)-1;
-% r_compansated = r_compansated.*exp(1i*2*pi*freqEst_fine.*nn'/Fs);
+

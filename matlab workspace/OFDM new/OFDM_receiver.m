@@ -1,6 +1,6 @@
 
 rx_parallel = reshape(rx,80,83);
-rx_parallel = rx_parallel(:,10);
+rx_parallel = rx_parallel(:,83);
 for d=1:83; 
 %               Receiver
     %% Removing CP and FFT
@@ -14,7 +14,7 @@ for d=1:83;
     pilot_loc = 1:16:60;
     ls_channel = X_ffted(pilot_loc,1)./pilt;
     
-    H_interpolated = interpolate(ls_channel',pilot_loc,Nfft,'spline');
+     H_interpolated = interpolate(ls_channel',pilot_loc,Nfft,'spline');
     
     X_equ(:,d) = X_ffted.*conj(H_interpolated')./abs(H_interpolated').^2;
 % X_equ = X_ffted
@@ -26,7 +26,7 @@ for d=1:83;
     
     dem_symbol = [dem_symbol(2:16,1); dem_symbol(18:32,1); dem_symbol(34:48,1); dem_symbol(50:64,1)]; 
     
-    ber = 1-sum(dem_symbol(:) == cons_sym_id(:))/length(dem_symbol);
+    ber = 1-sum(dem_symbol(:) == cons_sym_id(:,80))/length(dem_symbol);
             
             
 end
