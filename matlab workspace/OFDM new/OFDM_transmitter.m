@@ -1,8 +1,8 @@
 % No. of Pilots: 4
 % Cylic Extension: 25%(16)
-close all
-clear all
-clc
+% close all
+% clear all
+% clc
 %%
 % Generating and coding data
 t_data=randi([0,1],9600,1)';

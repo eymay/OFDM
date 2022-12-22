@@ -1,4 +1,4 @@
-clear
+
 %% Generate OFDM Waveform
 % Burada kendi transmitter mýzdan aldýðýmýz datalarla gürültü ekleyip
 % random offset belirleyerek coarse time senkronizasyonu yapýyoruz
@@ -16,13 +16,14 @@ L = 80; % Short sync field length
 m = L; % Distance between fields
 N = 150; % Autocorrelation samples
 M = zeros(N,1);
-SNR = 30;
+% SNR = 10;
 for SNRindx = 1:length(SNR)
-    r = awgn(y,SNR(SNRindx),'measured');
+    r_fading = conv(y, g, 'same');
+    r_fading_awgn = awgn(r_fading,SNR(SNRindx),'measured');
     
     pfOffset = comm.PhaseFrequencyOffset('SampleRate',Fs,...
         'FrequencyOffset',2e3);
-    r_CFO = pfOffset(r);
+    r_CFO = pfOffset(r_fading_awgn);
     
     % Determine timing metric
     for k=1:N                   %% Auto corr döngüsü
@@ -41,7 +42,7 @@ for SNRindx = 1:length(SNR)
     title(['SNR: ',num2str(SNR(SNRindx)),'dB']);
 end
 
-starting_point_array = find(0.99<M);
+starting_point_array = find(0.79<M);
 starting_point = starting_point_array(1)
 freqEst = Fs/L*(angle(P(starting_point))/(2*pi));
 
