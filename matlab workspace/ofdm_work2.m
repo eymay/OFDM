@@ -20,7 +20,7 @@ g = g/norm(g);
 snr = 30;
 
 %%
-for d=1:80;
+for d=1:80
     data=t_data(x:x+119);
     x=x+120;
     k=3;
@@ -50,13 +50,13 @@ for d=1:80;
     %% ÝFFT and CP adding
     x_ifft = ifft(mod_data);
     
-    x_cpe = [x_ifft(end-n_cpe+1:end,:);x_ifft];
+    x_cpe(:,d) = [x_ifft(end-n_cpe+1:end,1);x_ifft];
     
     %% Fading channel
     
-    x_s_fading = conv(x_cpe, g, 'same');
+    x_s_fading(:,d) = conv(x_cpe(:,d), g, 'same');
     
-%         x_s_fading=awgn(x_cpe,snr,'measured');
+    x_s_fading_awgn(:,d) = awgn(x_s_fading(:,d),snr,'measured');
     
     
     %%
@@ -64,27 +64,27 @@ for d=1:80;
     %% Removing CP and FFT
     
     %     x_p_cpr = ofdm_sig(n_cpe+1:end,:);
-    x_p_cpr = x_s_fading(n_cpe+1:end,:);
+    x_p_cpr(:,d) = x_s_fading_awgn(n_cpe+1:end,d);
     
-    X_ffted = fft(x_p_cpr);
+    X_ffted = fft(x_p_cpr(:,d));
     
     %% Channel estimation
     pilot_loc = 1:16:60;
     ls_channel = X_ffted(pilot_loc,1)./pilt;
     
-    H_interpolated = interpolate(ls_channel',pilot_loc,Nfft,'spline');
+    H_interpolated = interpolate(ls_channel.',pilot_loc,Nfft,'spline');
     
-    X_equ(:,d) = X_ffted.*conj(H_interpolated')./abs(H_interpolated').^2;
+    X_equ(:,d) = X_ffted.*conj(H_interpolated.')./abs(H_interpolated.').^2;
 
     %% Demodulation
     
-    dem_symbol = qamdemod(X_equ,4);
+    dem_symbol(:,d) = qamdemod(X_equ(:,d),4);
     
     sym_rem = 0;
     
-    dem_symbol = [dem_symbol(2:16,1); dem_symbol(18:32,1); dem_symbol(34:48,1); dem_symbol(50:64,1)]; 
+    dem_symbol_pilots_removed(:,d) = [dem_symbol(2:16,d); dem_symbol(18:32,d); dem_symbol(34:48,d); dem_symbol(50:64,d)]; 
     
-    ber = 1-sum(dem_symbol(:) == cons_sym_id(:))/length(dem_symbol);
+    ber(d) = 1-sum(dem_symbol_pilots_removed(:,d) == cons_sym_id(:))/length(dem_symbol_pilots_removed(:,d));
             
             
 end

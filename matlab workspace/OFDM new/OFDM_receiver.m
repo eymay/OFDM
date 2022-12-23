@@ -1,12 +1,22 @@
+% close all
+% clear
+% clc
+% % 
+% 
 
-rx_parallel = reshape(rx,80,83);
-rx_parallel = rx_parallel(:,83);
-for d=1:83; 
+SNR = 20;
+
+% coarse_time;
+rx_parallel = reshape(rx(2:end,1),80,83);
+rx_parallel_preamble_removed = [rx_parallel(:,3:42) rx_parallel(:,44:end)];
+% rx_parallel = rx_parallel(:,83);
+
+for d=1:80 
 %               Receiver
     %% Removing CP and FFT
     
     %     x_p_cpr = ofdm_sig(n_cpe+1:end,:);
-    x_p_cpr = rx_parallel(n_cpe+1:end,:);
+    x_p_cpr = rx_parallel_preamble_removed(n_cpe+1:end,d);
     
     X_ffted = fft(x_p_cpr);
     
@@ -20,18 +30,18 @@ for d=1:83;
 % X_equ = X_ffted
     %% Demodulation
     
-    dem_symbol = qamdemod(X_equ,4);
+    dem_symbol(:,d) = qamdemod(X_equ(:,d),4);
     
     sym_rem = 0;
     
-    dem_symbol = [dem_symbol(2:16,1); dem_symbol(18:32,1); dem_symbol(34:48,1); dem_symbol(50:64,1)]; 
+    dem_symbol_pilots_removed(:,d) = [dem_symbol(2:16,d); dem_symbol(18:32,d); dem_symbol(34:48,d); dem_symbol(50:64,d)]; 
     
-    ber = 1-sum(dem_symbol(:) == cons_sym_id(:,80))/length(dem_symbol);
+    ber(d) = 1-sum(dem_symbol_pilots_removed(:,d) == cons_sym_id(:,d))/length(dem_symbol_pilots_removed(:,d));
             
-            
+     
+
 end
-
-
+ber_av(SNRindx) = sum(ber)/d;
 
 
 function [H_interpolated] = interpolate(H,pilot_loc,Nfft,method)
