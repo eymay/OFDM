@@ -1,6 +1,6 @@
 % close all
 % clear
-% clc
+% clc 
 % % 
 % 
 
