@@ -67,7 +67,7 @@ x_cpe = [seq, seq, x_cpe(:,1:40) seq x_cpe(:,41:80)]; % preamble location 1 2 43
 
 x_transmitted = reshape(x_cpe,[1,size(x_cpe,1)*size(x_cpe,2)]);
 
-y = x_transmitted.';
+% y = x_transmitted.';
 
 
 
