@@ -18,12 +18,12 @@ N = 150; % Autocorrelation samples
 M = zeros(N,1);
 SNR = 10;
 for SNRindx = 1:length(SNR)
-%     r_fading = conv(y, g, 'same');
-%     r_fading_awgn = awgn(r_fading,SNR(SNRindx),'measured');
+    r_fading = conv(y, g, 'same');
+    r_fading_awgn = awgn(r_fading,SNR(SNRindx),'measured');
     
-%     pfOffset = comm.PhaseFrequencyOffset('SampleRate',Fs,...
-%         'FrequencyOffset',2e3);
-%     r_CFO = pfOffset(r_fading_awgn);
+    pfOffset = comm.PhaseFrequencyOffset('SampleRate',Fs,...
+        'FrequencyOffset',2e3);
+    r_CFO = pfOffset(r_fading_awgn);
     
     % Determine timing metric
     for k=1:N                   %% Auto corr döngüsü

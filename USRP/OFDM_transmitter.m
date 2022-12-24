@@ -1,10 +1,12 @@
 % No. of Pilots: 4
 % Cylic Extension: 25%(16)
-close all
-clear 
-clc
+% close all
+% clear all
+% clc
 %%
 % Generating and coding data
+
+
 t_data=randi([0,1],9600,1)';
 x=1;
 si=1; %for BER rows
@@ -14,7 +16,7 @@ n_cpe = 16;
 Nfft = 64;
 n_taps = 3;
 with_cp = 80;
-symbol_number = 80;
+symbol_number = length(t_data)/120;
 
 g = exp(-(0:n_taps-1));
 g = g/norm(g);
@@ -63,7 +65,7 @@ seq = barker();
 % n = (randn(1,length(seq))+1i*randn(1,length(seq)));
 % 
 % seq = seq + sqrt(N0/2)*n'; 
-x_cpe = [seq, seq, x_cpe(:,1:40) seq x_cpe(:,41:80)]; % preamble location 1 2 43
+x_cpe = [seq, seq, x_cpe(:,1:40) seq x_cpe(:,41:end)]; % preamble location 1 2 43
 
 x_transmitted = reshape(x_cpe,[1,size(x_cpe,1)*size(x_cpe,2)]);
 
