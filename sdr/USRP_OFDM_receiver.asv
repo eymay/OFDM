@@ -5,7 +5,7 @@ clear
 Duration = 20;
 MasterClockRate = 20e6;
 DecimationFactor = 1;
-SamplesPerFrame = 50000;
+SamplesPerFrame = 3*6640;
 
 SampleRate = MasterClockRate/3;
 FrameDuration = SamplesPerFrame/SampleRate;
@@ -16,13 +16,13 @@ rx = comm.SDRuReceiver('Platform','B200','SerialNum','31FD9D5', ...
     'MasterClockRate',MasterClockRate, ...
     'DecimationFactor',DecimationFactor, ...
     'OutputDataType','double', ...
-    'SamplesPerFrame', 50000, ...
+    'SamplesPerFrame', 3*1840, ...
     'Gain', 20);
 count = 0;
 
 disp('Started Reception...');
 tic
-for i = 1:1600
+for i = 1:2500
     [data(:,i),~,overrun] = rx();
 %     datax(:,i) = data;
 %     if overrun

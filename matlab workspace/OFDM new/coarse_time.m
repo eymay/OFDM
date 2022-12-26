@@ -16,10 +16,10 @@ L = 80; % Short sync field length
 m = L; % Distance between fields
 N = 150; % Autocorrelation samples
 M = zeros(N,1);
-% SNR = 10;
+SNR = 10;
 for SNRindx = 1:length(SNR)
-    r_fading = conv(y, g, 'same');
-    r_fading_awgn = awgn(r_fading,SNR(SNRindx),'measured');
+%     r_fading = conv(y, g, 'same');
+    r_fading_awgn = awgn(y,SNR(SNRindx),'measured');
     
     pfOffset = comm.PhaseFrequencyOffset('SampleRate',Fs,...
         'FrequencyOffset',2e3);
@@ -42,7 +42,7 @@ for SNRindx = 1:length(SNR)
     title(['SNR: ',num2str(SNR(SNRindx)),'dB']);
 end
 
-starting_point_array = find(0.79<M);
+starting_point_array = find(0.95<M);
 starting_point = starting_point_array(1)
 freqEst = Fs/L*(angle(P(starting_point))/(2*pi));
 

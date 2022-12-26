@@ -1,12 +1,12 @@
 % close all
 % clear
-% clc
-% % 
+% clc 
+% %   
 % 
 
 SNR = 20;
 
-% coarse_time;
+coarse_time;
 rx_parallel = reshape(rx(2:end,1),80,83);
 rx_parallel_preamble_removed = [rx_parallel(:,3:42) rx_parallel(:,44:end)];
 % rx_parallel = rx_parallel(:,83);
