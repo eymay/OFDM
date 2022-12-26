@@ -20,7 +20,7 @@ tx = comm.SDRuTransmitter('Platform','B200','SerialNum','31FD9A2', ...
     'MasterClockRate',MasterClockRate, ...
     'InterpolationFactor',InterpolationFactor, ... 
     'LocalOscillatorOffset', 0, ...
-    'Gain', 30 );
+    'Gain', 50 );
      
 
 disp('Started Transmission...'); 
@@ -31,7 +31,7 @@ underrunCount = 0;
 tic
 % for i = 1:Iterations
 while 1
-    underrun = tx(y);
+     underrun = tx(y);
 %     if underrun
 %         underrunCount = underrunCount+1;
 %     end
