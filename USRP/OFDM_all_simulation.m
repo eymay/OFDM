@@ -1,7 +1,7 @@
 % No. of Pilots: 4
 % Cylic Extension: 25%(16)
 close all
-clear
+clearvars -except ber_av ii
 clc
 %%
 % Generating and coding data
@@ -70,7 +70,7 @@ g = g/norm(g);
     % Burada kendi transmitter mýzdan aldýðýmýz datalarla gürültü ekleyip
     % random offset belirleyerek coarse time senkronizasyonu yapýyoruz
     
-    SNR = 25;
+    SNR = 26;
 for SNRindx = 1:length(SNR)
     y = zeros(length(x_transmitted.'),1);
     y = x_transmitted.';
@@ -91,7 +91,7 @@ for SNRindx = 1:length(SNR)
     r_fading_awgn(:,SNRindx) = awgn(y,SNR(SNRindx),'measured');
     
     pfOffset = comm.PhaseFrequencyOffset('SampleRate',Fs,...
-        'FrequencyOffset',2e3);
+        'FrequencyOffset',4e3);
         %Signal with frequency offset and noise 
     r_CFO(:,SNRindx) = pfOffset(r_fading_awgn(:,SNRindx));
     
@@ -114,7 +114,7 @@ for SNRindx = 1:length(SNR)
     legend('Autocorrelation','True Start');
     title(['SNR: ',num2str(SNR(SNRindx)),'dB']);
     
-%     %Course Frequency Offset 
+    %Course Frequency Offset 
 %     a = 1;
 %     b = (1/50) * ones(1,50);
 %     diff_M = diff(M);
@@ -221,7 +221,10 @@ for SNRindx = 1:length(SNR)
         
         
     end
-    ber_av(SNRindx) = sum(ber)/d;
+    
+    
+    ber_av(ii) = sum(ber)/d;
+    ii  = ii+1;
 end
 
 
