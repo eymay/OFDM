@@ -65,7 +65,7 @@ seq = barker();
 % n = (randn(1,length(seq))+1i*randn(1,length(seq)));
 % 
 % seq = seq + sqrt(N0/2)*n'; 
-x_cpe = [seq, seq, x_cpe(:,1:40) seq x_cpe(:,41:end)]; % preamble location 1 2 43
+x_cpe = [seq, seq, x_cpe(:,1:7) seq x_cpe(:,8:end)]; % preamble location 1 2 28
 
 x_transmitted = reshape(x_cpe,[1,size(x_cpe,1)*size(x_cpe,2)]);
 

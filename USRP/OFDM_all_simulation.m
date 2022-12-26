@@ -117,27 +117,37 @@ for SNRindx = 1:length(SNR)
     %Course Frequency Offset 
     a = 1;
     b = (1/50) * ones(1,50);
+    diff_M = diff(M);
+    diff_ratios = [0; M]./[M; 1];
+       
     smooth_M = movmean(M, 3);
     diff_smooth_M = diff(smooth_M);
     max = 1;
     i = 2;
         while smooth_M(i + 1) > smooth_M(i)
-            if diff_smooth_M(i + 1) > diff_smooth_M(i)
-                max = i;
-            end
+            max = i;
+
             i = i+ 1;
         end  
-
+        interval = diff_smooth_M(i-3:i+3);
+        diff_ratios = [0; interval]./[interval; 1];
+        freq_i = min(diff_ratios);
+        freq_i = freq_i + 1;
+        figure 
+        stem(diff_ratios(:,SNRindx)) 
+        if diff_smooth_M(i )/diff_smooth_M(i + 1) > 1
+            max = i;
+        end
     starting_point_array = find(0.95<M);
     starting_point = starting_point_array(1)
     freqEst(SNRindx) = Fs/L*(angle(P(starting_point))/(2*pi));
     figure 
-    stem(K(:,SNRindx))
+    stem(smooth_M(:,SNRindx))
     figure
-    B = diff(M);
+    B = diff(smooth_M);
     stem(B(:,SNRindx));
     figure
-    C = diff(K);
+    C = diff(B);
     C = movmean(C, 3);
     stem(C(:,SNRindx));
     figure
