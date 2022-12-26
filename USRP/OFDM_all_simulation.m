@@ -15,10 +15,11 @@ n_taps = 3;
 with_cp = 80;
 symbol_number = 80;
 
+%Channel Transfer Function
 g = exp(-(0:n_taps-1));
 g = g/norm(g);
    
-    for d=1:symbol_number
+    for d=1:symbol_number %120 * 80 => (2*60) * 80 converted to two bit symbols 
         data=t_data(x:x+119);
         x=x+120;
         k=3;
@@ -39,18 +40,18 @@ g = g/norm(g);
         pilt=1+1i;
         nofpits=4;
         k=1;
-        
+        %60 symbol + 4 pilot symbols 
         mod_data = [pilt;mod_data(1:15,1);pilt;mod_data(16:30,1); ...
             pilt;mod_data(31:45,1); ...
             pilt;mod_data(46:60,1)];
         
-        %% ÝFFT and CP adding
+        %% IFFT and CP adding
         x_ifft = ifft(mod_data);
-        
+        %64 symbol + 16 CP symbol = 80 symbol packets
         x_cpe(:,d) = [x_ifft(end-n_cpe+1:end,:);x_ifft];
         %     x_cpe=awgn(x_cpe,snr,'measured');      % simülasyonlar için gürültü eklendi sonra silinecek
     end
-    
+    %Adding 3 preambles codes 
     barker = comm.BarkerCode('SamplesPerFrame',80);
     seq = barker();
     
@@ -69,16 +70,17 @@ g = g/norm(g);
     % Burada kendi transmitter mýzdan aldýðýmýz datalarla gürültü ekleyip
     % random offset belirleyerek coarse time senkronizasyonu yapýyoruz
     
-    SNR = 5:5:20;
+    SNR = 5;
 for SNRindx = 1:length(SNR)
     y = zeros(length(x_transmitted.'),1);
     y = x_transmitted.';
     % Add random offset
-    offset = randi([0 1e2]) % simülasyon için
+    offset = randi([11 1e2]) % simülasyon için
     y = [zeros(offset,1);y];
     
     Fs =1e6;
-    %% Schmidl and Cox: Coarse Packet Detection
+    
+    %% Schmidl and Cox: Coarse Packet/Time Detection
     L = 80; % Short sync field length
     m = L; % Distance between fields
     N = 150; % Autocorrelation samples
@@ -90,11 +92,12 @@ for SNRindx = 1:length(SNR)
     
     pfOffset = comm.PhaseFrequencyOffset('SampleRate',Fs,...
         'FrequencyOffset',2e3);
+        %Signal with frequency offset and noise 
     r_CFO(:,SNRindx) = pfOffset(r_fading_awgn(:,SNRindx));
     
     % Determine timing metric
     M = zeros(N,1);
-        
+       %Used for Course Time and Course Frequency Offsets
     for k=1:N                   %% Auto corr döngüsü
         P(k) = r_CFO(k:k+m,(SNRindx))' * r_CFO(k+L:k+m+L,(SNRindx));
         a = abs(y(k+L:k+m+L));
@@ -111,16 +114,43 @@ for SNRindx = 1:length(SNR)
     legend('Autocorrelation','True Start');
     title(['SNR: ',num2str(SNR(SNRindx)),'dB']);
     
-    
+    %Course Frequency Offset 
+    a = 1;
+    b = (1/50) * ones(1,50);
+    smooth_M = movmean(M, 3);
+    diff_smooth_M = diff(smooth_M);
+    max = 1;
+    i = 2;
+        while smooth_M(i + 1) > smooth_M(i)
+            if diff_smooth_M(i + 1) > diff_smooth_M(i)
+                max = i;
+            end
+            i = i+ 1;
+        end  
+
     starting_point_array = find(0.95<M);
     starting_point = starting_point_array(1)
     freqEst(SNRindx) = Fs/L*(angle(P(starting_point))/(2*pi));
+    figure 
+    stem(K(:,SNRindx))
+    figure
+    B = diff(M);
+    stem(B(:,SNRindx));
+    figure
+    C = diff(K);
+    C = movmean(C, 3);
+    stem(C(:,SNRindx));
+    figure
+    D = diff(C);
+    stem(abs(D(:,SNRindx)));
     
+    %Course Frequency Compensation
     nn = 0: length(r_CFO(:,SNRindx))-1;
     r_compansated(:,SNRindx) = r_CFO(:,SNRindx).*exp(-1i*2*pi*freqEst.*nn'/Fs);
     
+    %Fine Time Offset
     for k=starting_point-10:starting_point+10                %% Fine time senk
-        P_fine_corr_max(k) = max(xcorr(r_compansated(k:k+1*m-1,(SNRindx)), [seq]));
+        P_fine_corr_max(k) = max(xcorr(r_compansated(k:k+1*m-1,(SNRindx)), [seq])); %Seq -> preamble
         
     end
     [~,idx] = max(P_fine_corr_max) %Fine time index bulundu
@@ -131,49 +161,49 @@ for SNRindx = 1:length(SNR)
     
     
     
-    %% Fine freq senk
+    %% Fine frequency Synchronisation
     for ii=1:N                   %% Auto corr döngüsü
-        P_fine_freq(ii) = r_compansated(ii+idx:ii+m+idx,SNRindx)' * r_compansated(ii+idx+42*L:ii+idx+42*L+m,SNRindx);
+        P_fine_freq(ii) = r_compansated(ii+idx:ii+m+idx,SNRindx)' * r_compansated(ii+idx+42*L:ii+idx+42*L+m,SNRindx); %Correlation with third preamble 
         
     end
     
-    
+    %Fine Frequency Offset
     freqEst_fine = Fs/L*(angle(P_fine_freq(idx))/(2*pi));
-    
+    %Fine Frequency Compensation
     nn = 0: length(r_compansated(:,SNRindx))-1;
     r_compansated(:,SNRindx) = r_compansated(:,SNRindx).*exp(-1i*2*pi*freqEst_fine.*nn'/Fs);
     
     
     rx(:,SNRindx) = r_compansated(idx:end,SNRindx);
     
- 
+    %Series-to-Parallel
     rx_parallel(:,:,SNRindx) = reshape(rx(1:end),80,83);
+    %Removing Preambles
     rx_parallel_preamble_removed(:,:,SNRindx) = [rx_parallel(:,3:42,SNRindx) rx_parallel(:,44:end,SNRindx)];
-    % rx_parallel = rx_parallel(:,83);
     
     for d=1:80
         %               Receiver
         %% Removing CP and FFT
-        
-        %     x_p_cpr = ofdm_sig(n_cpe+1:end,:);
+     
         x_p_cpr = rx_parallel_preamble_removed(n_cpe+1:end,d,SNRindx);
         
         X_ffted = fft(x_p_cpr);
         
         %% Channel estimation
         pilot_loc = 1:16:60;
+        %Least Square Channel
         ls_channel = X_ffted(pilot_loc,1)./pilt;
-        
-        H_interpolated = interpolate(ls_channel',pilot_loc,Nfft,'spline');
-        
+        %Channel Transfer Function
+        H_interpolated = interpolate(ls_channel',pilot_loc,Nfft,'makima');
+        %Channel Equalization
         X_equ(:,d) = X_ffted.*conj(H_interpolated')./abs(H_interpolated').^2;
-        % X_equ = X_ffted
+       
         %% Demodulation
         
         dem_symbol(:,d) = qamdemod(X_equ(:,d),4);
-        
+        %error count
         sym_rem = 0;
-        
+        %Pilots removed
         dem_symbol_pilots_removed(:,d) = [dem_symbol(2:16,d); dem_symbol(18:32,d); dem_symbol(34:48,d); dem_symbol(50:64,d)];
         
         ber(d,SNRindx) = 1-sum(dem_symbol_pilots_removed(:,d) == cons_sym_id(:,d))/length(dem_symbol_pilots_removed(:,d));
@@ -202,7 +232,7 @@ if pilot_loc(end) <Nfft
     pilot_loc = [pilot_loc Nfft];
 end
 if lower(method(1))=='l', H_interpolated=interp1(pilot_loc,H,[1:Nfft]);
-else H_interpolated = interp1(pilot_loc,H,[1:Nfft],'spline');
+else H_interpolated = interp1(pilot_loc,H,[1:Nfft],'makima');
 end
 end
 
