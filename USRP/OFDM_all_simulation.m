@@ -1,7 +1,7 @@
 % No. of Pilots: 4
 % Cylic Extension: 25%(16)
 close all
-clear
+clearvars -except ber_av ii
 clc
 %%
 % Generating and coding data
@@ -70,7 +70,7 @@ g = g/norm(g);
     % Burada kendi transmitter mızdan aldığımız datalarla gürültü ekleyip
     % random offset belirleyerek coarse time senkronizasyonu yapıyoruz
     
-    SNR = 5;
+    SNR = 26;
 for SNRindx = 1:length(SNR)
     y = zeros(length(x_transmitted.'),1);
     y = x_transmitted.';
@@ -91,7 +91,7 @@ for SNRindx = 1:length(SNR)
     r_fading_awgn(:,SNRindx) = awgn(y,SNR(SNRindx),'measured');
     
     pfOffset = comm.PhaseFrequencyOffset('SampleRate',Fs,...
-        'FrequencyOffset',2e3);
+        'FrequencyOffset',4e3);
         %Signal with frequency offset and noise 
     r_CFO(:,SNRindx) = pfOffset(r_fading_awgn(:,SNRindx));
     
@@ -115,44 +115,44 @@ for SNRindx = 1:length(SNR)
     title(['SNR: ',num2str(SNR(SNRindx)),'dB']);
     
     %Course Frequency Offset 
-    a = 1;
-    b = (1/50) * ones(1,50);
-    diff_M = diff(M);
-    diff_ratios = [0; M]./[M; 1];
-       
-    smooth_M = movmean(M, 3);
-    diff_smooth_M = diff(smooth_M);
-    max = 1;
-    i = 2;
-        while smooth_M(i + 1) > smooth_M(i)
-            max = i;
-
-            i = i+ 1;
-        end  
-        interval = diff_smooth_M(i-3:i+3);
-        diff_ratios = [0; interval]./[interval; 1];
-        freq_i = min(diff_ratios);
-        freq_i = freq_i + 1;
-        figure 
-        stem(diff_ratios(:,SNRindx)) 
-        if diff_smooth_M(i )/diff_smooth_M(i + 1) > 1
-            max = i;
-        end
+%     a = 1;
+%     b = (1/50) * ones(1,50);
+%     diff_M = diff(M);
+%     diff_ratios = [0; M]./[M; 1];
+%        
+%     smooth_M = movmean(M, 3);
+%     diff_smooth_M = diff(smooth_M);
+%     max = 1;
+%     i = 2;
+%         while smooth_M(i + 1) >= smooth_M(i)
+%             max = i;
+%             i = i+ 1;
+%         end  
+%         interval = diff_smooth_M(i-3:i+3);
+%         diff_ratios = [0; interval]./[interval; 1];
+%         [ls,freq_i] = min(diff_ratios);
+%         freq_i = freq_i + 1;
+%         figure 
+%         stem(diff_ratios(:,SNRindx)) 
+%         if diff_smooth_M(i )/diff_smooth_M(i + 1) > 1
+%             max = i;
+%         end
+    
     starting_point_array = find(0.95<M);
     starting_point = starting_point_array(1)
     freqEst(SNRindx) = Fs/L*(angle(P(starting_point))/(2*pi));
-    figure 
-    stem(smooth_M(:,SNRindx))
-    figure
-    B = diff(smooth_M);
-    stem(B(:,SNRindx));
-    figure
-    C = diff(B);
-    C = movmean(C, 3);
-    stem(C(:,SNRindx));
-    figure
-    D = diff(C);
-    stem(abs(D(:,SNRindx)));
+%     figure 
+%     stem(smooth_M(:,SNRindx))
+%     figure
+%     B = diff(smooth_M);
+%     stem(B(:,SNRindx));
+%     figure
+%     C = diff(B);
+%     C = movmean(C, 3);
+%     stem(C(:,SNRindx));
+%     figure
+%     D = diff(C);
+%     stem(abs(D(:,SNRindx)));
     
     %Course Frequency Compensation
     nn = 0: length(r_CFO(:,SNRindx))-1;
@@ -172,13 +172,13 @@ for SNRindx = 1:length(SNR)
     
     
     %% Fine frequency Synchronisation
-    for ii=1:N                   %% Auto corr döngüsü
-        P_fine_freq(ii) = r_compansated(ii+idx:ii+m+idx,SNRindx)' * r_compansated(ii+idx+42*L:ii+idx+42*L+m,SNRindx); %Correlation with third preamble 
+%     for ii=1:N                   %% Auto corr döngüsü
+        P_fine_freq = r_compansated(idx:m+idx,SNRindx)' * r_compansated(idx+42*L:idx+42*L+m,SNRindx); %Correlation with third preamble 
         
-    end
+%     end
     
     %Fine Frequency Offset
-    freqEst_fine = Fs/L*(angle(P_fine_freq(idx))/(2*pi));
+    freqEst_fine = Fs/L*(angle(P_fine_freq)/(2*pi));
     %Fine Frequency Compensation
     nn = 0: length(r_compansated(:,SNRindx))-1;
     r_compansated(:,SNRindx) = r_compansated(:,SNRindx).*exp(-1i*2*pi*freqEst_fine.*nn'/Fs);
@@ -221,7 +221,10 @@ for SNRindx = 1:length(SNR)
         
         
     end
-    ber_av(SNRindx) = sum(ber)/d;
+    
+    
+    ber_av(ii) = sum(ber)/d;
+    ii  = ii+1;
 end
 
 
