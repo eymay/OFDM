@@ -87,7 +87,8 @@ for SNRindx = 1:length(SNR)
         'FrequencyOffset',4e3);
         %Signal with frequency offset and noise 
     r_CFO(:,SNRindx) = pfOffset(r_fading_awgn(:,SNRindx));
-    
+    scatterplot(r_CFO)
+    title("Unsynchronized Signal")
     % Determine timing metric
     M = zeros(N,1);
        %Used for Course Time and Course Frequency Offsets
@@ -116,6 +117,9 @@ for SNRindx = 1:length(SNR)
     nn = 0: length(r_CFO(:,SNRindx))-1;
     r_compansated(:,SNRindx) = r_CFO(:,SNRindx).*exp(-1i*2*pi*freqEst.*nn'/Fs);
     
+    scatterplot(r_compansated)
+    title("Coarse Frequency Compensated Signal")
+    
     %Fine Time Offset
     for k=starting_point-10:starting_point+10                %% Fine time senk
         P_fine_corr_max(k) = max(xcorr(r_compansated(k:k+1*m-1,(SNRindx)), [seq])); %Seq -> preamble
@@ -140,6 +144,9 @@ for SNRindx = 1:length(SNR)
     
     
     rx(:,SNRindx) = r_compansated(idx:end,SNRindx);
+    
+     scatterplot(r_compansated)
+    title("Fine Frequency Compensated Signal")
     
     %Series-to-Parallel
     rx_parallel(:,:,SNRindx) = reshape(rx(1:end),80,83);
@@ -181,6 +188,9 @@ for SNRindx = 1:length(SNR)
     ber_av(ii) = sum(ber)/d;
     ii  = ii+1;
 end
+sc = reshape(X_equ,1,64*80);
+scatterplot(sc)
+title("Demodulated Signal")
 
 
 
