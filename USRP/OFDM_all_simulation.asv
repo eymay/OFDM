@@ -3,6 +3,7 @@
 close all
 clearvars -except ber_av ii
 clc
+ii = 1;
 %%
 % Generating and coding data
 t_data=randi([0,1],9600,1)';

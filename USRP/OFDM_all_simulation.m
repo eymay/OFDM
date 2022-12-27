@@ -3,6 +3,7 @@
 close all
 clearvars -except ber_av ii
 clc
+ii = 1;
 %%
 % Generating and coding data
 t_data=randi([0,1],9600,1)';
@@ -49,16 +50,11 @@ g = g/norm(g);
         x_ifft = ifft(mod_data);
         %64 symbol + 16 CP symbol = 80 symbol packets
         x_cpe(:,d) = [x_ifft(end-n_cpe+1:end,:);x_ifft];
-        %     x_cpe=awgn(x_cpe,snr,'measured');      % sim�lasyonlar i�in g�r�lt� eklendi sonra silinecek
     end
     %Adding 3 preambles codes 
     barker = comm.BarkerCode('SamplesPerFrame',80);
     seq = barker();
     
-    % N0 = 1/(10^(snr/10));
-    % n = (randn(1,length(seq))+1i*randn(1,length(seq)));
-    %
-    % seq = seq + sqrt(N0/2)*n';
     x_cpe = [seq, seq, x_cpe(:,1:40) seq x_cpe(:,41:80)]; % preamble location 1 2 43
     
     x_transmitted = reshape(x_cpe,[1,size(x_cpe,1)*size(x_cpe,2)]);
@@ -84,9 +80,7 @@ for SNRindx = 1:length(SNR)
     m = L; % Distance between fields
     N = 150; % Autocorrelation samples
     M = zeros(N,1);
-%     r_fading_awgn(:,SNRindx) = zeros(length(x_transmitted.')+100,1); 
     
-    %     r_fading = conv(y, g, 'same');
     r_fading_awgn(:,SNRindx) = awgn(y,SNR(SNRindx),'measured');
     
     pfOffset = comm.PhaseFrequencyOffset('SampleRate',Fs,...
@@ -105,7 +99,6 @@ for SNRindx = 1:length(SNR)
     end
     % Plot
     figure
-%     subplot(length(SNR),1,SNRindx);
     stem(M(:,SNRindx));
     hold on;
     stem(offset+1,M(offset+1),'r*'); hold off;
@@ -113,13 +106,13 @@ for SNRindx = 1:length(SNR)
     legend('Autocorrelation','True Start');
     title(['SNR: ',num2str(SNR(SNRindx)),'dB']);
     
-    %Course Frequency Offset 
+    %Coarse Frequency Offset 
     starting_point_array = find(0.95<M);
     starting_point = starting_point_array(1)
     freqEst(SNRindx) = Fs/L*(angle(P(starting_point))/(2*pi));
 
     
-    %Course Frequency Compensation
+    %Coarse Frequency Compensation
     nn = 0: length(r_CFO(:,SNRindx))-1;
     r_compansated(:,SNRindx) = r_CFO(:,SNRindx).*exp(-1i*2*pi*freqEst.*nn'/Fs);
     
@@ -129,9 +122,6 @@ for SNRindx = 1:length(SNR)
         
     end
     [~,idx] = max(P_fine_corr_max) %Fine time index bulundu
-    
-    % [aa,bb] = xcorr(r_compansated(k:k+2*m), [seq;seq])
-    % plot(abs(aa(bb>=0)))
     
     
     
