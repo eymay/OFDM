@@ -12,7 +12,7 @@ np.random.seed(0)
 # Generating and coding data
 t_data = np.random.randint(0, 2, size=(9600,)).astype(float)
 
-x = 1
+x = 0
 # Size of cycle prefix extension
 n_cpe = 16
 Nfft = 64
@@ -29,18 +29,19 @@ cons_sym_id = np.zeros((2, symbol_number))
 x_cpe = np.zeros((Nfft + n_cpe, symbol_number), dtype=np.complex128)
 
 for d in range(symbol_number):
-    data = t_data[x-1:x+119]
+    data = t_data[x:x+120]
     x += 120
 
     k = 3
     n = 6
-    s1 = data.size
 
 
     # Binary stream to symbols
-    cons_data = data.reshape(int(s1 / 2), 2)
+    cons_data = np.reshape(data, (60 , 2))
+    for sym in cons_data:
+        print(sym)
     cons_sym_id[:, d] = np.packbits(cons_data, axis=1).flatten()
-
+    print(cons_sym_id)
     # Symbol modulation
     mod_data = np.mod(cons_sym_id[:, d], 4)
 
