@@ -337,7 +337,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [888, 540.0]
+    coordinate: [864, 540.0]
     rotation: 0
     state: enabled
 - name: epy_block_0
@@ -449,7 +449,7 @@ blocks:
     marker7: '0'
     marker8: '0'
     marker9: '0'
-    name: '""'
+    name: '"Received signal after sync"'
     nconnections: '1'
     size: '1024'
     style1: '0'
@@ -487,7 +487,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1696, 476.0]
+    coordinate: [1680, 460.0]
     rotation: 0
     state: enabled
 - name: qtgui_const_sink_x_0_0
@@ -633,7 +633,7 @@ blocks:
     marker7: '0'
     marker8: '0'
     marker9: '0'
-    name: '""'
+    name: '"Received signal without sync"'
     nconnections: '1'
     size: '1024'
     style1: '0'
@@ -671,7 +671,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [888, 476.0]
+    coordinate: [864, 452.0]
     rotation: 0
     state: enabled
 - name: qtgui_time_sink_x_0
@@ -882,7 +882,7 @@ blocks:
     clock_source6: ''
     clock_source7: ''
     comment: ''
-    dev_addr: '"serial=31FD9B0"'
+    dev_addr: '"serial=31FD9BD"'
     dev_args: ''
     gain0: '60'
     gain1: '0'
@@ -1223,7 +1223,7 @@ blocks:
     dc_offs_enb7: default
     dc_offs_enb8: default
     dc_offs_enb9: default
-    dev_addr: '"serial=31FD9C0"'
+    dev_addr: '"serial=31FD9CA"'
     dev_args: ''
     gain0: '60'
     gain1: '0'

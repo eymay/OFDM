@@ -5,8 +5,8 @@
 # SPDX-License-Identifier: GPL-3.0
 #
 # GNU Radio Python Flow Graph
-# Title: OFDM Tx
-# Description: Example of an OFDM Transmitter
+# Title: Not titled yet
+# Author: omero
 # GNU Radio version: 3.10.1.1
 
 from packaging.version import Version as StrictVersion
@@ -36,18 +36,20 @@ import signal
 from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
+from gnuradio import uhd
+import time
 from gnuradio.digital.utils import tagged_streams
 
 
 
 from gnuradio import qtgui
 
-class tx_ofdm(gr.top_block, Qt.QWidget):
+class main_Tx(gr.top_block, Qt.QWidget):
 
     def __init__(self):
-        gr.top_block.__init__(self, "OFDM Tx", catch_exceptions=True)
+        gr.top_block.__init__(self, "Not titled yet", catch_exceptions=True)
         Qt.QWidget.__init__(self)
-        self.setWindowTitle("OFDM Tx")
+        self.setWindowTitle("Not titled yet")
         qtgui.util.check_set_qss()
         try:
             self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
@@ -65,7 +67,7 @@ class tx_ofdm(gr.top_block, Qt.QWidget):
         self.top_grid_layout = Qt.QGridLayout()
         self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("GNU Radio", "tx_ofdm")
+        self.settings = Qt.QSettings("GNU Radio", "main_Tx")
 
         try:
             if StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
@@ -78,43 +80,56 @@ class tx_ofdm(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
-        self.my_constellation_qpsk = my_constellation_qpsk = digital.constellation_calcdist([-1-1j, -1+1j, 1+1j, 1-1j], [0, 1, 3, 2],
-        4, 1, digital.constellation.AMPLITUDE_NORMALIZATION).base()
-        self.my_constellation_bpsk = my_constellation_bpsk = digital.constellation_bpsk().base()
         self.pilot_symbols = pilot_symbols = ((1, 1, 1, -1,),)
         self.pilot_carriers = pilot_carriers = ((-21, -7, 7, 21,),)
-        self.payload_mod = payload_mod = my_constellation_qpsk
+        self.payload_mod = payload_mod = digital.constellation_qpsk()
         self.packet_length_tag_key = packet_length_tag_key = "packet_len"
         self.occupied_carriers = occupied_carriers = (list(range(-26, -21)) + list(range(-20, -7)) + list(range(-6, 0)) + list(range(1, 7)) + list(range(8, 21)) + list(range(22, 27)),)
         self.length_tag_key = length_tag_key = "frame_len"
-        self.header_mod = header_mod = my_constellation_bpsk
+        self.header_mod = header_mod = digital.constellation_bpsk()
         self.fft_len = fft_len = 64
-        self.sync_word2 = sync_word2 = [0, 0, 0, 0, 0, 0, -1, -1, -1, -1, 1, 1, -1, -1, -1, 1, -1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, 1, -1, -1, 1, -1, 0, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, 1, 1, 1, 1, -1, 1, -1, -1, -1, 1, -1, 1, -1, -1, -1, -1, 0, 0, 0, 0, 0]
+        self.sync_word2 = sync_word2 = [0j, 0j, 0j, 0j, 0j, 0j, (-1+0j), (-1+0j), (-1+0j), (-1+0j), (1+0j), (1+0j), (-1+0j), (-1+0j), (-1+0j), (1+0j), (-1+0j), (1+0j), (1+0j), (1 +0j), (1+0j), (1+0j), (-1+0j), (-1+0j), (-1+0j), (-1+0j), (-1+0j), (1+0j), (-1+0j), (-1+0j), (1+0j), (-1+0j), 0j, (1+0j), (-1+0j), (1+0j), (1+0j), (1+0j), (-1+0j), (1+0j), (1+0j), (1+0j), (-1+0j), (1+0j), (1+0j), (1+0j), (1+0j), (-1+0j), (1+0j), (-1+0j), (-1+0j), (-1+0j), (1+0j), (-1+0j), (1+0j), (-1+0j), (-1+0j), (-1+0j), (-1+0j), 0j, 0j, 0j, 0j, 0j]
         self.sync_word1 = sync_word1 = [0., 0., 0., 0., 0., 0., 0., 1.41421356, 0., -1.41421356, 0., 1.41421356, 0., -1.41421356, 0., -1.41421356, 0., -1.41421356, 0., 1.41421356, 0., -1.41421356, 0., 1.41421356, 0., -1.41421356, 0., -1.41421356, 0., -1.41421356, 0., -1.41421356, 0., 1.41421356, 0., -1.41421356, 0., 1.41421356, 0., 1.41421356, 0., 1.41421356, 0., -1.41421356, 0., 1.41421356, 0., 1.41421356, 0., 1.41421356, 0., -1.41421356, 0., 1.41421356, 0., 1.41421356, 0., 1.41421356, 0., 0., 0., 0., 0., 0.]
-        self.samp_rate = samp_rate = 128000
+        self.samp_rate = samp_rate = 180000
         self.rolloff = rolloff = 0
         self.payload_equalizer = payload_equalizer = digital.ofdm_equalizer_simpledfe(fft_len, payload_mod.base(), occupied_carriers, pilot_carriers, pilot_symbols, 1)
-        self.packet_len = packet_len = 60
+        self.packet_len = packet_len = 96
         self.header_formatter = header_formatter = digital.packet_header_ofdm(occupied_carriers, n_syms=1, len_tag_key=packet_length_tag_key, frame_len_tag_key=length_tag_key, bits_per_header_sym=header_mod.bits_per_symbol(), bits_per_payload_sym=payload_mod.bits_per_symbol(), scramble_header=False)
         self.header_equalizer = header_equalizer = digital.ofdm_equalizer_simpledfe(fft_len, header_mod.base(), occupied_carriers, pilot_carriers, pilot_symbols)
 
         ##################################################
         # Blocks
         ##################################################
+        self.uhd_usrp_sink_0_0 = uhd.usrp_sink(
+            ",".join(("serial=31FD9BD", '')),
+            uhd.stream_args(
+                cpu_format="fc32",
+                args='',
+                channels=list(range(0,1)),
+            ),
+            "",
+        )
+        self.uhd_usrp_sink_0_0.set_samp_rate(samp_rate)
+        self.uhd_usrp_sink_0_0.set_time_now(uhd.time_spec(time.time()), uhd.ALL_MBOARDS)
+
+        self.uhd_usrp_sink_0_0.set_center_freq(2.4e9, 0)
+        self.uhd_usrp_sink_0_0.set_antenna("TX/RX", 0)
+        self.uhd_usrp_sink_0_0.set_bandwidth(15e6, 0)
+        self.uhd_usrp_sink_0_0.set_gain(100, 0)
         self.qtgui_freq_sink_x_0 = qtgui.freq_sink_c(
             1024, #size
             window.WIN_BLACKMAN_hARRIS, #wintype
             2.4e9, #fc
-            samp_rate*1000, #bw
-            'Freqency Domain of Transmitted Signal', #name
+            samp_rate *100, #bw
+            'FFT Plot', #name
             1,
             None # parent
         )
         self.qtgui_freq_sink_x_0.set_update_time(0.10)
-        self.qtgui_freq_sink_x_0.set_y_axis(-110, 10)
+        self.qtgui_freq_sink_x_0.set_y_axis(-140, 10)
         self.qtgui_freq_sink_x_0.set_y_label('Relative Gain', 'dB')
         self.qtgui_freq_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, 0.0, 0, "")
-        self.qtgui_freq_sink_x_0.enable_autoscale(True)
+        self.qtgui_freq_sink_x_0.enable_autoscale(False)
         self.qtgui_freq_sink_x_0.enable_grid(True)
         self.qtgui_freq_sink_x_0.set_fft_average(1.0)
         self.qtgui_freq_sink_x_0.enable_axis_labels(True)
@@ -198,7 +213,7 @@ class tx_ofdm(gr.top_block, Qt.QWidget):
         self.qtgui_const_sink_x_0.set_y_axis(-2, 2)
         self.qtgui_const_sink_x_0.set_x_axis(-2, 2)
         self.qtgui_const_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, "")
-        self.qtgui_const_sink_x_0.enable_autoscale(True)
+        self.qtgui_const_sink_x_0.enable_autoscale(False)
         self.qtgui_const_sink_x_0.enable_grid(True)
         self.qtgui_const_sink_x_0.enable_axis_labels(True)
 
@@ -233,7 +248,7 @@ class tx_ofdm(gr.top_block, Qt.QWidget):
             self.top_grid_layout.setRowStretch(r, 1)
         for c in range(2, 3):
             self.top_grid_layout.setColumnStretch(c, 1)
-        self.fft_vxx_0 = fft.fft_vcc(fft_len, False, (), True, 1)
+        self.fft_vxx_0_0 = fft.fft_vcc(fft_len, False, (), True, 1)
         self.digital_packet_headergenerator_bb_0 = digital.packet_headergenerator_bb(header_formatter.base(), packet_length_tag_key)
         self.digital_ofdm_cyclic_prefixer_0 = digital.ofdm_cyclic_prefixer(
             fft_len,
@@ -241,32 +256,16 @@ class tx_ofdm(gr.top_block, Qt.QWidget):
             rolloff,
             packet_length_tag_key)
         self.digital_ofdm_carrier_allocator_cvc_0 = digital.ofdm_carrier_allocator_cvc( fft_len, occupied_carriers, pilot_carriers, pilot_symbols, (sync_word1, sync_word2), packet_length_tag_key, True)
-        self.digital_crc32_bb_0 = digital.crc32_bb(False, packet_length_tag_key, True)
-        self.digital_constellation_modulator_0_0 = digital.generic_mod(
-            constellation=my_constellation_qpsk,
-            differential=False,
-            samples_per_symbol=4,
-            pre_diff_code=True,
-            excess_bw=0.35,
-            verbose=False,
-            log=False,
-            truncate=False)
-        self.digital_constellation_modulator_0 = digital.generic_mod(
-            constellation=my_constellation_bpsk,
-            differential=False,
-            samples_per_symbol=2,
-            pre_diff_code=True,
-            excess_bw=0.35,
-            verbose=False,
-            log=False,
-            truncate=False)
-        self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
+        self.digital_crc32_bb_0_0 = digital.crc32_bb(False, packet_length_tag_key, True)
+        self.digital_chunks_to_symbols_xx_0_0 = digital.chunks_to_symbols_bc(payload_mod.points(), 1)
+        self.digital_chunks_to_symbols_xx_0 = digital.chunks_to_symbols_bc(header_mod.points(), 1)
+        self.blocks_throttle_0_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
         self.blocks_tagged_stream_mux_0 = blocks.tagged_stream_mux(gr.sizeof_gr_complex*1, packet_length_tag_key, 0)
         self.blocks_tag_gate_0 = blocks.tag_gate(gr.sizeof_gr_complex * 1, False)
         self.blocks_tag_gate_0.set_single_key("")
         self.blocks_stream_to_tagged_stream_0 = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, packet_len, packet_length_tag_key)
-        self.blocks_repack_bits_bb_0 = blocks.repack_bits_bb(8, payload_mod.bits_per_symbol(), packet_length_tag_key, False, gr.GR_LSB_FIRST)
-        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_cc(0.5)
+        self.blocks_repack_bits_bb_0_0 = blocks.repack_bits_bb(8, payload_mod.bits_per_symbol(), packet_length_tag_key, False, gr.GR_LSB_FIRST)
+        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_cc(0.05)
         self.analog_random_source_x_0 = blocks.vector_source_b(list(map(int, numpy.random.randint(0, 256, 128000))), True)
 
 
@@ -275,44 +274,31 @@ class tx_ofdm(gr.top_block, Qt.QWidget):
         ##################################################
         self.connect((self.analog_random_source_x_0, 0), (self.blocks_stream_to_tagged_stream_0, 0))
         self.connect((self.blocks_multiply_const_vxx_0, 0), (self.blocks_tag_gate_0, 0))
-        self.connect((self.blocks_repack_bits_bb_0, 0), (self.digital_constellation_modulator_0_0, 0))
-        self.connect((self.blocks_stream_to_tagged_stream_0, 0), (self.digital_crc32_bb_0, 0))
-        self.connect((self.blocks_tag_gate_0, 0), (self.blocks_throttle_0, 0))
+        self.connect((self.blocks_repack_bits_bb_0_0, 0), (self.digital_chunks_to_symbols_xx_0_0, 0))
+        self.connect((self.blocks_stream_to_tagged_stream_0, 0), (self.digital_crc32_bb_0_0, 0))
+        self.connect((self.blocks_tag_gate_0, 0), (self.blocks_throttle_0_0, 0))
         self.connect((self.blocks_tagged_stream_mux_0, 0), (self.digital_ofdm_carrier_allocator_cvc_0, 0))
         self.connect((self.blocks_tagged_stream_mux_0, 0), (self.qtgui_const_sink_x_0_1, 0))
-        self.connect((self.blocks_throttle_0, 0), (self.qtgui_const_sink_x_0, 0))
-        self.connect((self.blocks_throttle_0, 0), (self.qtgui_freq_sink_x_0, 0))
-        self.connect((self.digital_constellation_modulator_0, 0), (self.blocks_tagged_stream_mux_0, 0))
-        self.connect((self.digital_constellation_modulator_0_0, 0), (self.blocks_tagged_stream_mux_0, 1))
-        self.connect((self.digital_crc32_bb_0, 0), (self.blocks_repack_bits_bb_0, 0))
-        self.connect((self.digital_crc32_bb_0, 0), (self.digital_packet_headergenerator_bb_0, 0))
-        self.connect((self.digital_ofdm_carrier_allocator_cvc_0, 0), (self.fft_vxx_0, 0))
+        self.connect((self.blocks_throttle_0_0, 0), (self.qtgui_const_sink_x_0, 0))
+        self.connect((self.blocks_throttle_0_0, 0), (self.qtgui_freq_sink_x_0, 0))
+        self.connect((self.blocks_throttle_0_0, 0), (self.uhd_usrp_sink_0_0, 0))
+        self.connect((self.digital_chunks_to_symbols_xx_0, 0), (self.blocks_tagged_stream_mux_0, 0))
+        self.connect((self.digital_chunks_to_symbols_xx_0_0, 0), (self.blocks_tagged_stream_mux_0, 1))
+        self.connect((self.digital_crc32_bb_0_0, 0), (self.blocks_repack_bits_bb_0_0, 0))
+        self.connect((self.digital_crc32_bb_0_0, 0), (self.digital_packet_headergenerator_bb_0, 0))
+        self.connect((self.digital_ofdm_carrier_allocator_cvc_0, 0), (self.fft_vxx_0_0, 0))
         self.connect((self.digital_ofdm_cyclic_prefixer_0, 0), (self.blocks_multiply_const_vxx_0, 0))
-        self.connect((self.digital_packet_headergenerator_bb_0, 0), (self.digital_constellation_modulator_0, 0))
-        self.connect((self.fft_vxx_0, 0), (self.digital_ofdm_cyclic_prefixer_0, 0))
+        self.connect((self.digital_packet_headergenerator_bb_0, 0), (self.digital_chunks_to_symbols_xx_0, 0))
+        self.connect((self.fft_vxx_0_0, 0), (self.digital_ofdm_cyclic_prefixer_0, 0))
 
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("GNU Radio", "tx_ofdm")
+        self.settings = Qt.QSettings("GNU Radio", "main_Tx")
         self.settings.setValue("geometry", self.saveGeometry())
         self.stop()
         self.wait()
 
         event.accept()
-
-    def get_my_constellation_qpsk(self):
-        return self.my_constellation_qpsk
-
-    def set_my_constellation_qpsk(self, my_constellation_qpsk):
-        self.my_constellation_qpsk = my_constellation_qpsk
-        self.set_payload_mod(self.my_constellation_qpsk)
-
-    def get_my_constellation_bpsk(self):
-        return self.my_constellation_bpsk
-
-    def set_my_constellation_bpsk(self, my_constellation_bpsk):
-        self.my_constellation_bpsk = my_constellation_bpsk
-        self.set_header_mod(self.my_constellation_bpsk)
 
     def get_pilot_symbols(self):
         return self.pilot_symbols
@@ -390,8 +376,9 @@ class tx_ofdm(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.blocks_throttle_0.set_sample_rate(self.samp_rate)
-        self.qtgui_freq_sink_x_0.set_frequency_range(2.4e9, self.samp_rate*1000)
+        self.blocks_throttle_0_0.set_sample_rate(self.samp_rate)
+        self.qtgui_freq_sink_x_0.set_frequency_range(2.4e9, self.samp_rate *100)
+        self.uhd_usrp_sink_0_0.set_samp_rate(self.samp_rate)
 
     def get_rolloff(self):
         return self.rolloff
@@ -428,7 +415,7 @@ class tx_ofdm(gr.top_block, Qt.QWidget):
 
 
 
-def main(top_block_cls=tx_ofdm, options=None):
+def main(top_block_cls=main_Tx, options=None):
 
     if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
         style = gr.prefs().get_string('qtgui', 'style', 'raster')
