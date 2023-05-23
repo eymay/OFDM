@@ -320,7 +320,7 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
-    display: 'False'
+    display: 'True'
     filter: '""'
     name: Rx Bytes
     num_inputs: '1'
@@ -446,7 +446,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1384, 412.0]
+    coordinate: [1304, 460.0]
     rotation: 0
     state: enabled
 - name: digital_ofdm_chanest_vcvc_0
@@ -848,7 +848,7 @@ blocks:
     autoscale: 'False'
     average: '1.0'
     axislabels: 'True'
-    bw: samp_rate*1000
+    bw: samp_rate*100
     color1: '"blue"'
     color10: '"dark blue"'
     color2: '"red"'
@@ -1086,7 +1086,7 @@ blocks:
     dc_offs_enb7: default
     dc_offs_enb8: default
     dc_offs_enb9: default
-    dev_addr: '"serial = 31FD9CA"'
+    dev_addr: '"serial = 31FD9BD"'
     dev_args: ''
     gain0: '60'
     gain1: '0'

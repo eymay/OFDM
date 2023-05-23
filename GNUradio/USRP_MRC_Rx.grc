@@ -447,10 +447,10 @@ blocks:
     block_tags: 'True'
     comment: ''
     epsilon: '1.0'
-    freq_offset: 0* 1.0/fft_len
+    freq_offset: 1* 1.0/fft_len
     maxoutbuf: '0'
     minoutbuf: '0'
-    noise_voltage: '0.0'
+    noise_voltage: '0'
     seed: '0'
     taps: '1.0'
   states:
@@ -468,10 +468,10 @@ blocks:
     block_tags: 'True'
     comment: ''
     epsilon: '1.0'
-    freq_offset: 0* 1.0/fft_len
+    freq_offset: 1* 1.0/fft_len
     maxoutbuf: '0'
     minoutbuf: '0'
-    noise_voltage: '0.0'
+    noise_voltage: '0'
     seed: '0'
     taps: '1.0'
   states:
