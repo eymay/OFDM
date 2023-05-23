@@ -1292,7 +1292,7 @@ blocks:
     bus_structure: null
     coordinate: [1328, 956.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: qtgui_const_sink_x_0_0
   id: qtgui_const_sink_x
   parameters:
@@ -1660,7 +1660,7 @@ blocks:
     bus_structure: null
     coordinate: [912, 524.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: qtgui_freq_sink_x_0
   id: qtgui_freq_sink_x
   parameters:

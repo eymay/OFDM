@@ -106,7 +106,7 @@ class USRP_MRC_Rx(gr.top_block, Qt.QWidget):
         # Blocks
         ##################################################
         self.uhd_usrp_source_0_0 = uhd.usrp_source(
-            ",".join(("serial = 31FD9CA", '')),
+            ",".join(("serial = 31FD9BD", '')),
             uhd.stream_args(
                 cpu_format="fc32",
                 args='',
@@ -119,7 +119,7 @@ class USRP_MRC_Rx(gr.top_block, Qt.QWidget):
         self.uhd_usrp_source_0_0.set_center_freq(2.4e9, 0)
         self.uhd_usrp_source_0_0.set_antenna("RX2", 0)
         self.uhd_usrp_source_0_0.set_bandwidth(15e6, 0)
-        self.uhd_usrp_source_0_0.set_gain(60, 0)
+        self.uhd_usrp_source_0_0.set_gain(40, 0)
         self.uhd_usrp_source_0 = uhd.usrp_source(
             ",".join(("serial = 31FD9CA", '')),
             uhd.stream_args(
@@ -134,7 +134,7 @@ class USRP_MRC_Rx(gr.top_block, Qt.QWidget):
         self.uhd_usrp_source_0.set_center_freq(2.4e9, 0)
         self.uhd_usrp_source_0.set_antenna("RX2", 0)
         self.uhd_usrp_source_0.set_bandwidth(15e6, 0)
-        self.uhd_usrp_source_0.set_gain(60, 0)
+        self.uhd_usrp_source_0.set_gain(40, 0)
         self.qtgui_const_sink_x_0_0_1 = qtgui.const_sink_c(
             1024, #size
             'Received data without sync Antenna_2', #name
@@ -225,51 +225,6 @@ class USRP_MRC_Rx(gr.top_block, Qt.QWidget):
             self.top_grid_layout.setRowStretch(r, 1)
         for c in range(1, 2):
             self.top_grid_layout.setColumnStretch(c, 1)
-        self.qtgui_const_sink_x_0_0 = qtgui.const_sink_c(
-            1024, #size
-            'Received data without sync Antenna_1', #name
-            1, #number of inputs
-            None # parent
-        )
-        self.qtgui_const_sink_x_0_0.set_update_time(0.1)
-        self.qtgui_const_sink_x_0_0.set_y_axis(-2, 2)
-        self.qtgui_const_sink_x_0_0.set_x_axis(-2, 2)
-        self.qtgui_const_sink_x_0_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, "")
-        self.qtgui_const_sink_x_0_0.enable_autoscale(False)
-        self.qtgui_const_sink_x_0_0.enable_grid(True)
-        self.qtgui_const_sink_x_0_0.enable_axis_labels(True)
-
-
-        labels = ['', '', '', '', '',
-            '', '', '', '', '']
-        widths = [1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1]
-        colors = ["blue", "red", "red", "red", "red",
-            "red", "red", "red", "red", "red"]
-        styles = [0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0]
-        markers = [0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0]
-        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0, 1.0]
-
-        for i in range(1):
-            if len(labels[i]) == 0:
-                self.qtgui_const_sink_x_0_0.set_line_label(i, "Data {0}".format(i))
-            else:
-                self.qtgui_const_sink_x_0_0.set_line_label(i, labels[i])
-            self.qtgui_const_sink_x_0_0.set_line_width(i, widths[i])
-            self.qtgui_const_sink_x_0_0.set_line_color(i, colors[i])
-            self.qtgui_const_sink_x_0_0.set_line_style(i, styles[i])
-            self.qtgui_const_sink_x_0_0.set_line_marker(i, markers[i])
-            self.qtgui_const_sink_x_0_0.set_line_alpha(i, alphas[i])
-
-        self._qtgui_const_sink_x_0_0_win = sip.wrapinstance(self.qtgui_const_sink_x_0_0.qwidget(), Qt.QWidget)
-        self.top_grid_layout.addWidget(self._qtgui_const_sink_x_0_0_win, 2, 1, 1, 1)
-        for r in range(2, 3):
-            self.top_grid_layout.setRowStretch(r, 1)
-        for c in range(1, 2):
-            self.top_grid_layout.setColumnStretch(c, 1)
         self.fft_vxx_1_0 = fft.fft_vcc(fft_len, True, (), True, 1)
         self.fft_vxx_1 = fft.fft_vcc(fft_len, True, (), True, 1)
         self.fft_vxx_0_0 = fft.fft_vcc(fft_len, True, (), True, 1)
@@ -314,15 +269,15 @@ class USRP_MRC_Rx(gr.top_block, Qt.QWidget):
         self.digital_constellation_decoder_cb_0_0 = digital.constellation_decoder_cb(header_mod.base())
         self.digital_constellation_decoder_cb_0 = digital.constellation_decoder_cb(header_mod.base())
         self.channels_channel_model_0_0 = channels.channel_model(
-            noise_voltage=0.1,
-            frequency_offset=2* 1.0/fft_len,
+            noise_voltage=0.0,
+            frequency_offset=0* 1.0/fft_len,
             epsilon=1.0,
             taps=[1.0],
             noise_seed=0,
             block_tags=True)
         self.channels_channel_model_0 = channels.channel_model(
-            noise_voltage=0.1,
-            frequency_offset=2* 1.0/fft_len,
+            noise_voltage=0.0,
+            frequency_offset=0* 1.0/fft_len,
             epsilon=1.0,
             taps=[1.0],
             noise_seed=0,
@@ -359,7 +314,6 @@ class USRP_MRC_Rx(gr.top_block, Qt.QWidget):
         self.connect((self.blocks_throttle_0_0, 0), (self.blocks_delay_0_0, 0))
         self.connect((self.blocks_throttle_0_0, 0), (self.digital_ofdm_sync_sc_cfb_0_0, 0))
         self.connect((self.channels_channel_model_0, 0), (self.blocks_throttle_0, 0))
-        self.connect((self.channels_channel_model_0, 0), (self.qtgui_const_sink_x_0_0, 0))
         self.connect((self.channels_channel_model_0_0, 0), (self.blocks_throttle_0_0, 0))
         self.connect((self.channels_channel_model_0_0, 0), (self.qtgui_const_sink_x_0_0_1, 0))
         self.connect((self.digital_constellation_decoder_cb_0, 0), (self.digital_packet_headerparser_b_0, 0))
@@ -462,8 +416,8 @@ class USRP_MRC_Rx(gr.top_block, Qt.QWidget):
         self.analog_frequency_modulator_fc_0_0.set_sensitivity(-2.0/self.fft_len)
         self.blocks_delay_0.set_dly(self.fft_len+self.fft_len//4)
         self.blocks_delay_0_0.set_dly(self.fft_len+self.fft_len//4)
-        self.channels_channel_model_0.set_frequency_offset(2* 1.0/self.fft_len)
-        self.channels_channel_model_0_0.set_frequency_offset(2* 1.0/self.fft_len)
+        self.channels_channel_model_0.set_frequency_offset(0* 1.0/self.fft_len)
+        self.channels_channel_model_0_0.set_frequency_offset(0* 1.0/self.fft_len)
 
     def get_sync_word2(self):
         return self.sync_word2

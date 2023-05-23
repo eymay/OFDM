@@ -447,10 +447,10 @@ blocks:
     block_tags: 'True'
     comment: ''
     epsilon: '1.0'
-    freq_offset: 2* 1.0/fft_len
+    freq_offset: 0* 1.0/fft_len
     maxoutbuf: '0'
     minoutbuf: '0'
-    noise_voltage: '0.1'
+    noise_voltage: '0.0'
     seed: '0'
     taps: '1.0'
   states:
@@ -468,10 +468,10 @@ blocks:
     block_tags: 'True'
     comment: ''
     epsilon: '1.0'
-    freq_offset: 2* 1.0/fft_len
+    freq_offset: 0* 1.0/fft_len
     maxoutbuf: '0'
     minoutbuf: '0'
-    noise_voltage: '0.1'
+    noise_voltage: '0.0'
     seed: '0'
     taps: '1.0'
   states:
@@ -1007,7 +1007,7 @@ blocks:
     bus_structure: null
     coordinate: [976, 380.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: qtgui_const_sink_x_0_0_0
   id: qtgui_const_sink_x
   parameters:
@@ -1531,7 +1531,7 @@ blocks:
     dc_offs_enb9: default
     dev_addr: '"serial = 31FD9CA"'
     dev_args: ''
-    gain0: '60'
+    gain0: '40'
     gain1: '0'
     gain10: '0'
     gain11: '0'
@@ -1965,9 +1965,9 @@ blocks:
     dc_offs_enb7: default
     dc_offs_enb8: default
     dc_offs_enb9: default
-    dev_addr: '"serial = 31FD9CA"'
+    dev_addr: '"serial = 31FD9BD"'
     dev_args: ''
-    gain0: '60'
+    gain0: '40'
     gain1: '0'
     gain10: '0'
     gain11: '0'

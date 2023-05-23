@@ -1,0 +1,34 @@
+id: mrc_hier
+label: Maximum Ratio Combiner
+category: '[GRC Hier Blocks]'
+
+parameters: []
+
+inputs:
+-   label: R1
+    dtype: complex
+    vlen: 64
+-   label: R2
+    dtype: complex
+    vlen: 64
+-   label: h_1
+    dtype: complex
+    vlen: 64
+-   label: h_2
+    dtype: complex
+    vlen: 64
+
+outputs:
+-   label: out
+    dtype: complex
+    vlen: 64
+
+templates:
+    imports: 'from mrc_hier import mrc_hier  # grc-generated hier_block'
+    make: mrc_hier()
+    callbacks: []
+
+documentation: /home/omero/.grc_gnuradio/mrc_hier.py
+grc_source: /home/omero/OFDM/GNUradio/mrc_hier.grc
+
+file_format: 1
