@@ -109,9 +109,9 @@ are combined with MRC method. In detail, these signals are weighted
 according to their channel characteristics and then they are combined.
 This procedure can be expressed as,
 
-$$\Tilde{s}=\frac{h_0^* y_0+h_1^* y_1+\ldots+h_{N-1}^* y_{N-1}}{\left|h_0\right|^2+\left|h_1\right|^2+\ldots+\left|h_{N-1}\right|^2}$$
+$$\tilde{s}=\frac{h_0^* y_0+h_1^* y_1+\ldots+h_{N-1}^* y_{N-1}}{\left|h_0\right|^2+\left|h_1\right|^2+\ldots+\left|h_{N-1}\right|^2}$$
 
-where $\Tilde{s}$ is the combined signal. After that, detection and
+where $\tilde{s}$ is the combined signal. After that, detection and
 demodulation processes are performed.
 
 ## Practical Background Information
