@@ -102,7 +102,7 @@ class main_Rx(gr.top_block, Qt.QWidget):
         # Blocks
         ##################################################
         self.uhd_usrp_source_0 = uhd.usrp_source(
-            ",".join(("serial = 31FD9BD", '')),
+            ",".join(("serial = 31FD9CA", '')),
             uhd.stream_args(
                 cpu_format="fc32",
                 args='',
@@ -361,8 +361,8 @@ class main_Rx(gr.top_block, Qt.QWidget):
 
     def set_occupied_carriers(self, occupied_carriers):
         self.occupied_carriers = occupied_carriers
-        self.set_header_equalizer(digital.ofdm_equalizer_simpledfe(self.fft_len, header_mod.base(), self.occupied_carriers, self.pilot_carriers, self.pilot_symbols))
         self.set_header_formatter(digital.packet_header_ofdm(self.occupied_carriers, n_syms=1, len_tag_key=self.packet_length_tag_key, frame_len_tag_key=self.length_tag_key, bits_per_header_sym=header_mod.bits_per_symbol(), bits_per_payload_sym=payload_mod.bits_per_symbol(), scramble_header=False))
+        self.set_header_equalizer(digital.ofdm_equalizer_simpledfe(self.fft_len, header_mod.base(), self.occupied_carriers, self.pilot_carriers, self.pilot_symbols))
         self.set_payload_equalizer(digital.ofdm_equalizer_simpledfe(self.fft_len, payload_mod.base(), self.occupied_carriers, self.pilot_carriers, self.pilot_symbols, 1))
 
     def get_length_tag_key(self):
@@ -383,11 +383,11 @@ class main_Rx(gr.top_block, Qt.QWidget):
 
     def set_fft_len(self, fft_len):
         self.fft_len = fft_len
-        self.set_header_equalizer(digital.ofdm_equalizer_simpledfe(self.fft_len, header_mod.base(), self.occupied_carriers, self.pilot_carriers, self.pilot_symbols))
-        self.set_payload_equalizer(digital.ofdm_equalizer_simpledfe(self.fft_len, payload_mod.base(), self.occupied_carriers, self.pilot_carriers, self.pilot_symbols, 1))
         self.analog_frequency_modulator_fc_0.set_sensitivity(-2.0/self.fft_len)
         self.blocks_delay_0.set_dly(self.fft_len+self.fft_len//4)
         self.channels_channel_model_0.set_frequency_offset(2* 1.0/self.fft_len)
+        self.set_header_equalizer(digital.ofdm_equalizer_simpledfe(self.fft_len, header_mod.base(), self.occupied_carriers, self.pilot_carriers, self.pilot_symbols))
+        self.set_payload_equalizer(digital.ofdm_equalizer_simpledfe(self.fft_len, payload_mod.base(), self.occupied_carriers, self.pilot_carriers, self.pilot_symbols, 1))
 
     def get_sync_word2(self):
         return self.sync_word2

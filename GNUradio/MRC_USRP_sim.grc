@@ -113,7 +113,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '96'
+    value: '64'
   states:
     bus_sink: false
     bus_source: false
@@ -198,7 +198,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '64000'
+    value: '32000'
   states:
     bus_sink: false
     bus_source: false
@@ -253,9 +253,9 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [2656, 1512.0]
+    coordinate: [2680, 1496.0]
     rotation: 0
-    state: true
+    state: disabled
 - name: analog_frequency_modulator_fc_0
   id: analog_frequency_modulator_fc
   parameters:
@@ -298,7 +298,7 @@ blocks:
     maxoutbuf: '0'
     min: '0'
     minoutbuf: '0'
-    num_samps: '128000'
+    num_samps: '1000'
     repeat: 'True'
     type: byte
   states:
@@ -1070,6 +1070,46 @@ blocks:
     coordinate: [3040, 1108.0]
     rotation: 0
     state: enabled
+- name: epy_block_0
+  id: epy_block
+  parameters:
+    _source_code: "\"\"\"\nEmbedded Python Blocks:\n\nEach time this file is saved,\
+      \ GRC will instantiate the first class it finds\nto get ports and parameters\
+      \ of your block. The arguments to __init__  will\nbe the parameters. All of\
+      \ them are required to have default values!\n\"\"\"\n\nimport numpy as np\n\
+      from gnuradio import gr\n\n\nclass blk(gr.sync_block):  # other base classes\
+      \ are basic_block, decim_block, interp_block\n    \"\"\"Embedded Python Block\
+      \ example - a simple multiply const\"\"\"\n\n    def __init__(self, example_param=1.0):\
+      \  # only default arguments here\n        \"\"\"arguments to this function show\
+      \ up as parameters in GRC\"\"\"\n        gr.sync_block.__init__(\n         \
+      \   self,\n            name='Embedded Python Block',   # will show up in GRC\n\
+      \            in_sig=[\n            (np.complex64,64),\n            (np.complex64,64),\n\
+      \            (np.complex64,64),\n            (np.complex64,64)], \n        \
+      \    out_sig= [(np.complex64,64)]\n        )\n        # if an attribute with\
+      \ the same name as a parameter is found,\n        # a callback is registered\
+      \ (properties work, too).\n        self.example_param = example_param\n\n  \
+      \  def work(self, input_items, output_items):\n        \"\"\"Maximal Ratio Combining\"\
+      \"\"\n        h_1 = input_items[2]\n        h_2 = input_items[3]\n        h_1_conj\
+      \ = np.conjugate(h_1)\n        h_2_conj = np.conjugate(h_2)\n        output_items[0]\
+      \ = (np.dot(h_1_conj, input_items[0]) + np.dot(h_2_conj, input_items[1]))/(np.dot(h_1_conj,\
+      \ h_1) + np.dot(h_2_conj, h_2))\n        return len(output_items[0])\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    example_param: '1.0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    _io_cache: ('Embedded Python Block', 'blk', [('example_param', '1.0')], [('0',
+      'complex', 64), ('1', 'complex', 64), ('2', 'complex', 64), ('3', 'complex',
+      64)], [('0', 'complex', 64)], 'Embedded Python Block example - a simple multiply
+      const', ['example_param'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [2656, 1496.0]
+    rotation: 0
+    state: true
 - name: fft_vxx_0
   id: fft_vxx
   parameters:
@@ -1384,7 +1424,7 @@ blocks:
     bus_structure: null
     coordinate: [2768, 260.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: qtgui_const_sink_x_0_0_0
   id: qtgui_const_sink_x
   parameters:
@@ -1476,7 +1516,7 @@ blocks:
     bus_structure: null
     coordinate: [2368, 1892.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: qtgui_const_sink_x_0_0_1
   id: qtgui_const_sink_x
   parameters:
@@ -3180,7 +3220,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1344, 796.0]
+    coordinate: [1464, 780.0]
     rotation: 0
     state: enabled
 - name: virtual_sink_2
@@ -3430,11 +3470,14 @@ connections:
 - [digital_packet_headerparser_b_0, header_data, digital_header_payload_demux_0, header_data]
 - [digital_packet_headerparser_b_0_0, header_data, digital_header_payload_demux_0_0,
   header_data]
+- [epy_block_0, '0', digital_ofdm_serializer_vcc_payload, '0']
 - [fft_vxx_0, '0', digital_ofdm_chanest_vcvc_0, '0']
 - [fft_vxx_0_0, '0', digital_ofdm_chanest_vcvc_0_0, '0']
 - [fft_vxx_0_0_0, '0', digital_ofdm_cyclic_prefixer_0, '0']
 - [fft_vxx_1, '0', MRC_0, '0']
+- [fft_vxx_1, '0', epy_block_0, '0']
 - [fft_vxx_1_0, '0', MRC_0, '1']
+- [fft_vxx_1_0, '0', epy_block_0, '1']
 - [uhd_usrp_source_0, '0', channels_channel_model_0, '0']
 - [uhd_usrp_source_0_0, '0', channels_channel_model_0_0, '0']
 - [virtual_source_0, '0', fft_vxx_0, '0']
@@ -3447,8 +3490,9 @@ connections:
 - [virtual_source_0_1_0, '0', digital_chunks_to_symbols_xx_0, '0']
 - [virtual_source_1, '0', fft_vxx_1, '0']
 - [virtual_source_1_0, '0', fft_vxx_1_0, '0']
-- [virtual_source_2, '0', MRC_0, '3']
-- [virtual_source_3, '0', MRC_0, '2']
+- [virtual_source_2, '0', MRC_0, '2']
+- [virtual_source_2, '0', epy_block_0, '3']
+- [virtual_source_3, '0', epy_block_0, '2']
 - [virtual_source_4, '0', channels_channel_model_0, '0']
 - [virtual_source_4, '0', channels_channel_model_0_0, '0']
 

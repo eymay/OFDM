@@ -42,7 +42,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [320, 4.0]
+    coordinate: [336, 20.0]
     rotation: 0
     state: enabled
 - name: header_equalizer
@@ -55,7 +55,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [672, 68.0]
+    coordinate: [688, 84.0]
     rotation: 0
     state: enabled
 - name: header_formatter
@@ -69,7 +69,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [672, 132.0]
+    coordinate: [688, 148.0]
     rotation: 0
     state: enabled
 - name: header_mod
@@ -81,7 +81,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [672, 4.0]
+    coordinate: [688, 20.0]
     rotation: 0
     state: enabled
 - name: length_tag_key
@@ -93,7 +93,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [392, 4.0]
+    coordinate: [408, 20.0]
     rotation: 0
     state: enabled
 - name: occupied_carriers
@@ -106,7 +106,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [512, 4.0]
+    coordinate: [528, 20.0]
     rotation: 0
     state: enabled
 - name: packet_len
@@ -118,7 +118,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [176, 116.0]
+    coordinate: [192, 132.0]
     rotation: 0
     state: enabled
 - name: packet_length_tag_key
@@ -130,7 +130,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [320, 68.0]
+    coordinate: [336, 84.0]
     rotation: 0
     state: enabled
 - name: payload_equalizer
@@ -143,7 +143,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [864, 68.0]
+    coordinate: [880, 84.0]
     rotation: 0
     state: enabled
 - name: payload_mod
@@ -155,7 +155,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [864, 4.0]
+    coordinate: [880, 20.0]
     rotation: 0
     state: enabled
 - name: pilot_carriers
@@ -167,7 +167,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [512, 68.0]
+    coordinate: [528, 84.0]
     rotation: 0
     state: enabled
 - name: pilot_symbols
@@ -179,7 +179,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [512, 132.0]
+    coordinate: [528, 148.0]
     rotation: 0
     state: enabled
 - name: rolloff
@@ -191,7 +191,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [320, 132.0]
+    coordinate: [336, 148.0]
     rotation: 0
     state: enabled
 - name: samp_rate
@@ -203,7 +203,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [176, 52.0]
+    coordinate: [192, 68.0]
     rotation: 0
     state: enabled
 - name: sync_word1
@@ -220,7 +220,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [8, 100.0]
+    coordinate: [24, 116.0]
     rotation: 0
     state: enabled
 - name: sync_word2
@@ -238,7 +238,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [8, 164.0]
+    coordinate: [24, 180.0]
     rotation: 0
     state: enabled
 - name: analog_frequency_modulator_fc_0
@@ -643,7 +643,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [176, 12.0]
+    coordinate: [192, 12.0]
     rotation: 0
     state: enabled
 - name: qtgui_const_sink_x_0_0
@@ -1086,7 +1086,7 @@ blocks:
     dc_offs_enb7: default
     dc_offs_enb8: default
     dc_offs_enb9: default
-    dev_addr: '"serial = 31FD9BD"'
+    dev_addr: '"serial = 31FD9CA"'
     dev_args: ''
     gain0: '60'
     gain1: '0'

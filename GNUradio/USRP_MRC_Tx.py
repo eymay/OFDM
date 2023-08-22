@@ -25,7 +25,7 @@ from PyQt5 import Qt
 from gnuradio import qtgui
 import sip
 from gnuradio import blocks
-import numpy
+import pmt
 from gnuradio import digital
 from gnuradio import fft
 from gnuradio.fft import window
@@ -36,6 +36,8 @@ import signal
 from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
+from gnuradio import uhd
+import time
 from gnuradio.digital.utils import tagged_streams
 
 
@@ -88,7 +90,7 @@ class USRP_MRC_Tx(gr.top_block, Qt.QWidget):
         self.fft_len = fft_len = 64
         self.sync_word2 = sync_word2 = [0j, 0j, 0j, 0j, 0j, 0j, (-1+0j), (-1+0j), (-1+0j), (-1+0j), (1+0j), (1+0j), (-1+0j), (-1+0j), (-1+0j), (1+0j), (-1+0j), (1+0j), (1+0j), (1 +0j), (1+0j), (1+0j), (-1+0j), (-1+0j), (-1+0j), (-1+0j), (-1+0j), (1+0j), (-1+0j), (-1+0j), (1+0j), (-1+0j), 0j, (1+0j), (-1+0j), (1+0j), (1+0j), (1+0j), (-1+0j), (1+0j), (1+0j), (1+0j), (-1+0j), (1+0j), (1+0j), (1+0j), (1+0j), (-1+0j), (1+0j), (-1+0j), (-1+0j), (-1+0j), (1+0j), (-1+0j), (1+0j), (-1+0j), (-1+0j), (-1+0j), (-1+0j), 0j, 0j, 0j, 0j, 0j]
         self.sync_word1 = sync_word1 = [0., 0., 0., 0., 0., 0., 0., 1.41421356, 0., -1.41421356, 0., 1.41421356, 0., -1.41421356, 0., -1.41421356, 0., -1.41421356, 0., 1.41421356, 0., -1.41421356, 0., 1.41421356, 0., -1.41421356, 0., -1.41421356, 0., -1.41421356, 0., -1.41421356, 0., 1.41421356, 0., -1.41421356, 0., 1.41421356, 0., 1.41421356, 0., 1.41421356, 0., -1.41421356, 0., 1.41421356, 0., 1.41421356, 0., 1.41421356, 0., -1.41421356, 0., 1.41421356, 0., 1.41421356, 0., 1.41421356, 0., 0., 0., 0., 0., 0.]
-        self.samp_rate = samp_rate = 64000
+        self.samp_rate = samp_rate = 180000
         self.rolloff = rolloff = 0
         self.payload_equalizer = payload_equalizer = digital.ofdm_equalizer_simpledfe(fft_len, payload_mod.base(), occupied_carriers, pilot_carriers, pilot_symbols, 1)
         self.packet_len = packet_len = 96
@@ -98,6 +100,22 @@ class USRP_MRC_Tx(gr.top_block, Qt.QWidget):
         ##################################################
         # Blocks
         ##################################################
+        self.uhd_usrp_sink_0_0 = uhd.usrp_sink(
+            ",".join(("serial=31FD9A2", '')),
+            uhd.stream_args(
+                cpu_format="fc32",
+                args='',
+                channels=list(range(0,1)),
+            ),
+            "",
+        )
+        self.uhd_usrp_sink_0_0.set_samp_rate(samp_rate)
+        self.uhd_usrp_sink_0_0.set_time_now(uhd.time_spec(time.time()), uhd.ALL_MBOARDS)
+
+        self.uhd_usrp_sink_0_0.set_center_freq(2.4e9, 0)
+        self.uhd_usrp_sink_0_0.set_antenna("TX/RX", 0)
+        self.uhd_usrp_sink_0_0.set_bandwidth(15e6, 0)
+        self.uhd_usrp_sink_0_0.set_gain(100, 0)
         self.qtgui_const_sink_x_0_1 = qtgui.const_sink_c(
             1024, #size
             'QPSK data with headers', #name
@@ -199,27 +217,27 @@ class USRP_MRC_Tx(gr.top_block, Qt.QWidget):
         self.digital_crc32_bb_0_0 = digital.crc32_bb(False, packet_length_tag_key, True)
         self.digital_chunks_to_symbols_xx_0_0 = digital.chunks_to_symbols_bc(payload_mod.points(), 1)
         self.digital_chunks_to_symbols_xx_0 = digital.chunks_to_symbols_bc(header_mod.points(), 1)
-        self.blocks_throttle_0_0_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
         self.blocks_tagged_stream_mux_0 = blocks.tagged_stream_mux(gr.sizeof_gr_complex*1, packet_length_tag_key, 0)
         self.blocks_tag_gate_0 = blocks.tag_gate(gr.sizeof_gr_complex * 1, False)
         self.blocks_tag_gate_0.set_single_key("")
         self.blocks_stream_to_tagged_stream_0 = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, packet_len, packet_length_tag_key)
         self.blocks_repack_bits_bb_0_0 = blocks.repack_bits_bb(8, payload_mod.bits_per_symbol(), packet_length_tag_key, False, gr.GR_LSB_FIRST)
         self.blocks_multiply_const_vxx_0 = blocks.multiply_const_cc(0.05)
-        self.analog_random_source_x_0 = blocks.vector_source_b(list(map(int, numpy.random.randint(0, 256, 128000))), True)
+        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_char*1, '/home/eymen/Documents/hablab/OFDM/data.txt', True, 0, 0)
+        self.blocks_file_source_0.set_begin_tag(pmt.PMT_NIL)
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.analog_random_source_x_0, 0), (self.blocks_stream_to_tagged_stream_0, 0))
+        self.connect((self.blocks_file_source_0, 0), (self.blocks_stream_to_tagged_stream_0, 0))
         self.connect((self.blocks_multiply_const_vxx_0, 0), (self.blocks_tag_gate_0, 0))
         self.connect((self.blocks_repack_bits_bb_0_0, 0), (self.digital_chunks_to_symbols_xx_0_0, 0))
         self.connect((self.blocks_stream_to_tagged_stream_0, 0), (self.digital_crc32_bb_0_0, 0))
-        self.connect((self.blocks_tag_gate_0, 0), (self.blocks_throttle_0_0_0, 0))
+        self.connect((self.blocks_tag_gate_0, 0), (self.qtgui_const_sink_x_0, 0))
+        self.connect((self.blocks_tag_gate_0, 0), (self.uhd_usrp_sink_0_0, 0))
         self.connect((self.blocks_tagged_stream_mux_0, 0), (self.digital_ofdm_carrier_allocator_cvc_0, 0))
         self.connect((self.blocks_tagged_stream_mux_0, 0), (self.qtgui_const_sink_x_0_1, 0))
-        self.connect((self.blocks_throttle_0_0_0, 0), (self.qtgui_const_sink_x_0, 0))
         self.connect((self.digital_chunks_to_symbols_xx_0, 0), (self.blocks_tagged_stream_mux_0, 0))
         self.connect((self.digital_chunks_to_symbols_xx_0_0, 0), (self.blocks_tagged_stream_mux_0, 1))
         self.connect((self.digital_crc32_bb_0_0, 0), (self.blocks_repack_bits_bb_0_0, 0))
@@ -314,7 +332,7 @@ class USRP_MRC_Tx(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.blocks_throttle_0_0_0.set_sample_rate(self.samp_rate)
+        self.uhd_usrp_sink_0_0.set_samp_rate(self.samp_rate)
 
     def get_rolloff(self):
         return self.rolloff
